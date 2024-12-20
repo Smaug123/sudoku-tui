@@ -7,59 +7,67 @@
     nixpkgs.follows = "rust-overlay/nixpkgs";
   };
 
-  outputs = inputs:
-    with inputs;
-      flake-utils.lib.eachDefaultSystem (
-        system: let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [cargo2nix.overlays.default];
-          };
+  outputs = {
+    flake-utils,
+    self,
+    nixpkgs,
+    cargo2nix,
+    ...
+  }:
+    flake-utils.lib.eachDefaultSystem (
+      system: let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [cargo2nix.overlays.default];
+        };
 
-          rustConfig = {
-            rustVersion = "1.83.0";
-            packageFun = import ./Cargo.nix;
-            extraRustComponents = ["clippy"];
-          };
+        rustConfig = {
+          rustVersion = "1.83.0";
+          packageFun = import ./Cargo.nix;
+          extraRustComponents = ["clippy"];
+        };
 
-          rustPkgs = pkgs.rustBuilder.makePackageSet rustConfig;
-          clippyPkgs = pkgs.rustBuilder.makePackageSet ({
-              packageOverrides = pkgs:
-                pkgs.rustBuilder.overrides.all
-                ++ [
-                  (pkgs.rustBuilder.rustLib.makeOverride {
-                    name = "sudoku";
-                    overrideAttrs = drv: {
-                      setBuildEnv = ''
-                        ${drv.setBuildEnv or ""}
-                        echo
-                        echo --- BUILDING WITH CLIPPY ---
-                        echo
-                        export RUSTC="''${CLIPPY_DRIVER}"
-                      '';
-                    };
-                  })
-                ];
-            }
-            // rustConfig);
-        in rec {
-          packages = {
-            sudoku = rustPkgs.workspace.sudoku {};
-            default = packages.sudoku;
-            cargoTests = pkgs.rustBuilder.runTests rustPkgs.workspace.sudoku {
-              testCommand = bin: ''INSTA_WORKSPACE_ROOT="$(dirname ${./flake.nix})/" "${bin}"'';
-            };
-            clippy = clippyPkgs.workspace.sudoku {};
-          };
-          devShells = {
-            default = pkgs.mkShell {
-              packages = [
-                pkgs.cargo-insta
-                pkgs.alejandra
-                pkgs.cargo
+        rustPkgs = pkgs.rustBuilder.makePackageSet rustConfig;
+        clippyPkgs = pkgs.rustBuilder.makePackageSet ({
+            packageOverrides = pkgs:
+              pkgs.rustBuilder.overrides.all
+              ++ [
+                (pkgs.rustBuilder.rustLib.makeOverride {
+                  name = "sudoku";
+                  overrideAttrs = drv: {
+                    setBuildEnv = ''
+                      ${drv.setBuildEnv or ""}
+                      echo
+                      echo --- BUILDING WITH CLIPPY ---
+                      echo
+                      export RUSTC="''${CLIPPY_DRIVER}"
+                    '';
+                  };
+                })
               ];
-            };
+          }
+          // rustConfig);
+      in rec {
+        packages = {
+          sudoku = rustPkgs.workspace.sudoku {};
+          default = packages.sudoku;
+          cargoTests = pkgs.rustBuilder.runTests rustPkgs.workspace.sudoku {
+            testCommand = bin: ''
+            echo ${self}
+            INSTA_UPDATE=no INSTA_WORKSPACE_ROOT="${self}" "${bin}"
+            '';
           };
-        }
-      );
+          clippy = clippyPkgs.workspace.sudoku {};
+        };
+        devShells = {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.cargo-insta
+              pkgs.alejandra
+              pkgs.cargo
+            ];
+          };
+        };
+      }
+    );
 }

@@ -21,7 +21,7 @@ jobs:
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    
+
       - name: Set up Nix cache
         uses: cachix/cachix-action@v14
         with:
@@ -35,7 +35,12 @@ jobs:
         run: nix build '.#clippy'
 
       - name: Test
-        run: nix build '.#cargoTests'
+        run: |
+          exit_code=$(nix build '.#cargoTests')
+          if [ "$exit_code" -ne 0 ]; then
+            nix log '.#cargoTests'
+            exit "$exit_code"
+          fi
 
   format:
     runs-on: ubuntu-latest

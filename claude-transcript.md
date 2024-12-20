@@ -110,3 +110,97 @@ The result Just Worked (except for an import issue).
 
 I didn't use LLMs for this at all; just standard Google etc.
 Both Claude and Copilot were totally useless for this.
+
+# Dividers between boxes
+
+At this point we consistently have this kind of display:
+
+```
+      ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│
+      │    ││    ││    ││ 2  ││ 6  ││    ││ 7  ││    ││ 1  │
+      └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│
+      ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│
+      │ 6  ││ 8  ││    ││    ││ 7  ││    ││    ││ 9  ││    │
+```
+
+Notice the unsightly overlap between the dividing lines and the boxes.
+
+Claude [was eventually able to fix this](https://claude.ai/chat/5664acec-e180-4057-ad4e-8ca3b560ac79), but it took a bunch of adjustments to my method of asking.
+
+# Review
+
+[Claude's review](https://claude.ai/chat/b9287623-9332-4dcd-adee-bf09a09fb8d7) at around commit fd8fcb80fb63fbd9555e5124a128325c2c189e94:
+
+```
+I'll analyze this code from a structural and idiomatic perspective. Here are the key areas for improvement:
+
+Error Handling
+
+
+The load_from_string method silently truncates input if it exceeds 9x9 dimensions. It should either return an Error variant or validate dimensions upfront.
+The Result type from file operations is propagated but never handled meaningfully - errors should be wrapped in a domain-specific error type that provides context.
+
+
+Type Safety
+
+
+Cell coordinates are represented as raw usize values throughout. This creates potential for confusion between x/y coordinates. A newtype pattern like GridPosition { x: usize, y: usize } would be more type-safe.
+InputMode could be more precisely modeled - the three modes represent fundamentally different operations on different aspects of cell state.
+
+
+Data Structure Design
+
+
+The grid field uses Vec<Vec<Cell>> which is suboptimal for a fixed-size 9x9 grid. A flat [Cell; 81] with coordinate translation functions would be more efficient and prevent invalid states.
+SortedVec for corner/centre numbers seems overengineered - since we're dealing with single-digit numbers, a simple bitset would be more efficient.
+
+
+State Management
+
+
+The App struct combines UI state (cursor position, input mode) with game state (grid). These concerns should be separated.
+Cell modification logic in handle_input has complex branching that could be simplified by making invalid states unrepresentable through types.
+
+
+Code Organization
+
+
+UI layout code is mixed with game logic. The ui function is doing too much - it should be split into smaller, focused components.
+Drawing functions contain magic numbers (e.g., cell dimensions) that should be constants or configuration.
+
+
+Rust Idioms
+
+
+saturating_sub is used inconsistently - sometimes bounds are checked with min, other times with saturating_sub.
+The Default derivation for Cell implies that an empty cell is the default state, but the domain logic suggests otherwise.
+
+
+Test Coverage
+
+
+The single snapshot test is insufficient. Property-based tests for grid operations and unit tests for state transitions would provide better coverage.
+Test setup could be simplified with a builder pattern for App construction.
+
+
+Documentation
+
+
+Public types lack documentation comments explaining their invariants and usage.
+Complex state transition logic (especially in handle_input) needs documentation explaining the business rules.
+
+
+Memory Efficiency
+
+
+Storing both corner and centre numbers as Vecs is wasteful given their small, fixed maximum sizes. A fixed-size array would be more appropriate.
+
+
+Drawing Logic
+
+
+The draw_cell function has boolean parameters for thick borders. This would be clearer as an enum describing the cell's position in the grid.
+The rendering code assumes a fixed terminal size without graceful degradation for smaller terminals.
+
+These issues don't prevent the program from functioning, but addressing them would improve maintainability, correctness, and performance. Would you like me to elaborate on any particular aspect?
+```
