@@ -11,3 +11,6 @@ sorted-vec = '0.8.5'
 
 [dev-dependencies]
 insta = "1.34.0"
+
+[lints.rust]
+warnings = 'deny'

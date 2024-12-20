@@ -35,8 +35,6 @@
                         echo
                         echo --- BUILDING WITH CLIPPY ---
                         echo
-
-                        export NIX_RUST_BUILD_FLAGS="''${NIX_RUST_BUILD_FLAGS} --deny warnings"
                         export RUSTC="''${CLIPPY_DRIVER}"
                       '';
                     };
