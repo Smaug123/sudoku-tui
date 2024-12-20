@@ -31,6 +31,12 @@ jobs:
       - name: Build
         run: nix build
 
+      - name: Clippy
+        run: nix build '.#clippy'
+
+      - name: Test
+        run: nix build '.#cargoTests'
+
   format:
     runs-on: ubuntu-latest
     steps:
@@ -47,3 +53,13 @@ jobs:
 
       - name: Run cargo fmt
         run: nix develop --command cargo fmt --check
+
+  all-required-checks-complete:
+    needs: [format, tests]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: G-Research/common-actions/check-required-lite@2b7dc49cb14f3344fbe6019c14a31165e258c059
+        with:
+          needs-context: ${{ toJSON(needs) }}
+
