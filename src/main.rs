@@ -459,8 +459,10 @@ mod tests {
     use insta::assert_snapshot;
     use ratatui::{backend::TestBackend, Terminal};
 
+    const WIDTH: u16 = 80;
+
     fn setup_test_terminal() -> Terminal<TestBackend> {
-        let backend = TestBackend::new(80, 120);
+        let backend = TestBackend::new(WIDTH, 120);
         Terminal::new(backend).unwrap()
     }
 
@@ -490,7 +492,7 @@ mod tests {
             .enumerate()
             .map(|(i, cell)| {
                 let c = cell.symbol().to_string();
-                if i % 80 == 79 {
+                if (i as u16) % WIDTH == WIDTH - 1 {
                     format!("{}\n", c)
                 } else {
                     c
