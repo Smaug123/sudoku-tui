@@ -340,7 +340,7 @@ fn ui(f: &mut Frame, app: &App) {
 
     // Draw horizontal dividers
     for div_y in 1..=2 {
-        let y_pos = grid_area.y + ((div_y * 3 * cell_height) as u16);
+        let y_pos = grid_area.y + (div_y * 3 * cell_height);
         for x in 0..total_width {
             let x_pos = grid_area.x + x;
             f.render_widget(
@@ -354,7 +354,7 @@ fn ui(f: &mut Frame, app: &App) {
 
     // Draw vertical dividers
     for div_x in 1..=2 {
-        let x_pos = grid_area.x + ((div_x * 3 * cell_width) as u16);
+        let x_pos = grid_area.x + (div_x * 3 * cell_width);
         for y in 0..total_height {
             let y_pos = grid_area.y + y;
             f.render_widget(
