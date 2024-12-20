@@ -317,15 +317,15 @@ fn ui(f: &mut Frame, app: &App) {
     let main_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length((9 * 3) as u16),       // Grid height
+            Constraint::Length((9 * 5) as u16),       // Grid height
             Constraint::Length(1),                    // Mode indicator
             Constraint::Min(HELP_LINES.len() as u16), // Help text
         ])
         .split(size);
 
     // Create a layout for the 9x9 grid
-    let cell_width = 6;
-    let cell_height = 3;
+    let cell_width = 8;
+    let cell_height = 5;
     let total_width = cell_width * 9;
     let grid_area = Rect::new(
         (size.width.saturating_sub(total_width)) / 2,
@@ -462,47 +462,6 @@ mod tests {
             })
             .collect::<String>();
 
-        assert_snapshot!(rendered, @r#"
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │    ││    ││    ││ 2  ││ 6  ││    ││ 7  ││    ││ 1  │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │ 6  ││ 8  ││    ││    ││ 7  ││    ││    ││ 9  ││    │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │ 1  ││ 9  ││    ││    ││    ││ 4  ││ 5  ││    ││    │             
-        ──────────────────────────────────────────────────────             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │ 8  ││ 2  ││    ││ 1  ││    ││    ││    ││ 4  ││    │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │    ││    ││ 4  ││ 6  ││    ││ 2  ││ 9  ││    ││    │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │    ││ 5  ││    ││    ││    ││ 3  ││    ││ 2  ││ 8  │             
-        ──────────────────────────────────────────────────────             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │    ││    ││ 9  ││ 3  ││    ││    ││    ││ 7  ││ 4  │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │    ││ 4  ││    ││    ││ 5  ││    ││    ││ 3  ││ 6  │             
-        └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│             
-        ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│             
-        │ 7  ││    ││ 3  ││    ││ 1  ││ 8  ││    ││    ││    │             
-        ──────────────────────────────────────────────────────             
-                           Mode: Normal (/)                                
-        ┌Help────────────────────────────────────────────────┐             
-        │Movement: ↑ ↓ ← → arrow keys to navigate the grid   │             
-        │Modes:                                              │             
-        │/ - Normal mode (enter numbers directly)            │             
-        │, - Corner mode (small numbers in corners)          │             
-        │. - Centre mode (small numbers in centre)           │             
-        │Numbers: Use keys 1-9 to enter values               │             
-        │Color coding:                                       │             
-        │Green - Fixed numbers (unchangeable)                │             
-        │White - User-entered numbers                        │             
-        │Yellow - Corner numbers (up to 4)                   │             
-        └────────────────────────────────────────────────────┘
-        "#);
+        assert_snapshot!(rendered);
     }
 }
