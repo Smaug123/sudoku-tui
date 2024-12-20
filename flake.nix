@@ -47,7 +47,7 @@
             sudoku = rustPkgs.workspace.sudoku {};
             default = packages.sudoku;
             cargoTests = pkgs.rustBuilder.runTests rustPkgs.workspace.sudoku {
-                testCommand = bin: ''INSTA_WORKSPACE_ROOT="$(dirname ${./flake.nix})/" "${bin}"'';
+              testCommand = bin: ''INSTA_WORKSPACE_ROOT="$(dirname ${./flake.nix})/" "${bin}"'';
             };
             clippy = clippyPkgs.workspace.sudoku {};
           };
