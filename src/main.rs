@@ -317,8 +317,8 @@ fn ui(f: &mut Frame, app: &App) {
     let main_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length((9 * 5 + 2) as u16),   // Grid height + dividers
-            Constraint::Length(1),                    // Mode indicator
+            Constraint::Length((9 * 5 + 2) as u16), // Grid height + dividers
+            Constraint::Length(1),                  // Mode indicator
             Constraint::Min(HELP_LINES.len() as u16), // Help text
         ])
         .split(size);
@@ -330,7 +330,7 @@ fn ui(f: &mut Frame, app: &App) {
     let divider_height = 1;
     let total_width = (cell_width * 9) + (divider_width * 2); // Add space for 2 vertical dividers
     let total_height = (cell_height * 9) + (divider_height * 2); // Add space for 2 horizontal dividers
-    
+
     let grid_area = Rect::new(
         (size.width.saturating_sub(total_width)) / 2,
         main_layout[0].y,
@@ -372,7 +372,7 @@ fn ui(f: &mut Frame, app: &App) {
             // Calculate position accounting for dividers
             let extra_x_dividers = (x / 3) as u16;
             let extra_y_dividers = (y / 3) as u16;
-            
+
             let cell_area = Rect::new(
                 grid_area.x + (x as u16 * cell_width) + extra_x_dividers,
                 grid_area.y + (y as u16 * cell_height) + extra_y_dividers,
