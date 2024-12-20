@@ -19,6 +19,7 @@
           rustPkgs = pkgs.rustBuilder.makePackageSet {
             rustVersion = "1.83.0";
             packageFun = import ./Cargo.nix;
+            extraRustComponents = ["clippy"];
           };
         in rec {
           packages = {
@@ -27,11 +28,13 @@
             cargoTests = pkgs.rustBuilder.runTests rustPkgs.workspace.sudoku {};
           };
           devShells = {
-              default = pkgs.mkShell {
-      packages = [
-        pkgs.cargo-insta
-      ];
-          };
+            default = pkgs.mkShell {
+              packages = [
+                pkgs.cargo-insta
+                pkgs.alejandra
+                pkgs.cargo
+              ];
+            };
           };
         }
       );
