@@ -156,26 +156,6 @@ fn draw_cell(
 
     f.render_widget(block.clone(), area);
 
-    // Draw thick borders manually
-    if is_right_thick {
-        let right_border = Block::default()
-            .style(Style::default().fg(Color::White))
-            .borders(Borders::LEFT);
-        f.render_widget(
-            right_border,
-            Rect::new(area.x + area.width - 1, area.y, 1, area.height),
-        );
-    }
-    if is_bottom_thick {
-        let bottom_border = Block::default()
-            .style(Style::default().fg(Color::White))
-            .borders(Borders::TOP);
-        f.render_widget(
-            bottom_border,
-            Rect::new(area.x, area.y + area.height - 1, area.width, 1),
-        );
-    }
-
     // Draw main number if it exists
     if let Some(num) = cell.main_number {
         let style = if cell.is_fixed {
@@ -230,6 +210,26 @@ fn draw_cell(
             let centre_area = centred_rect(cell.centre_numbers.len() as u16, 1, area);
             f.render_widget(p, centre_area);
         }
+    }
+
+    // Draw thick borders manually
+    if is_right_thick {
+        let right_border = Block::default()
+            .style(Style::default().fg(Color::White))
+            .borders(Borders::LEFT);
+        f.render_widget(
+            right_border,
+            Rect::new(area.x + area.width, area.y, 1, area.height),
+        );
+    }
+    if is_bottom_thick {
+        let bottom_border = Block::default()
+            .style(Style::default().fg(Color::White))
+            .borders(Borders::TOP);
+        f.render_widget(
+            bottom_border,
+            Rect::new(area.x, area.y + area.height, area.width, 1),
+        );
     }
 }
 
@@ -317,29 +317,65 @@ fn ui(f: &mut Frame, app: &App) {
     let main_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length((9 * 5) as u16),       // Grid height
+            Constraint::Length((9 * 5 + 2) as u16),   // Grid height + dividers
             Constraint::Length(1),                    // Mode indicator
             Constraint::Min(HELP_LINES.len() as u16), // Help text
         ])
         .split(size);
 
-    // Create a layout for the 9x9 grid
+    // Create a layout for the 9x9 grid with dividers
     let cell_width = 8;
     let cell_height = 5;
-    let total_width = cell_width * 9;
+    let divider_width = 1;
+    let divider_height = 1;
+    let total_width = (cell_width * 9) + (divider_width * 2); // Add space for 2 vertical dividers
+    let total_height = (cell_height * 9) + (divider_height * 2); // Add space for 2 horizontal dividers
+    
     let grid_area = Rect::new(
         (size.width.saturating_sub(total_width)) / 2,
         main_layout[0].y,
         total_width,
-        main_layout[0].height,
+        total_height,
     );
+
+    // Draw horizontal dividers
+    for div_y in 1..=2 {
+        let y_pos = grid_area.y + ((div_y * 3 * cell_height) as u16);
+        for x in 0..total_width {
+            let x_pos = grid_area.x + x;
+            f.render_widget(
+                Block::default()
+                    .style(Style::default().fg(Color::White))
+                    .borders(Borders::TOP),
+                Rect::new(x_pos, y_pos, 1, 1),
+            );
+        }
+    }
+
+    // Draw vertical dividers
+    for div_x in 1..=2 {
+        let x_pos = grid_area.x + ((div_x * 3 * cell_width) as u16);
+        for y in 0..total_height {
+            let y_pos = grid_area.y + y;
+            f.render_widget(
+                Block::default()
+                    .style(Style::default().fg(Color::White))
+                    .borders(Borders::LEFT),
+                Rect::new(x_pos, y_pos, 1, 1),
+            );
+        }
+    }
 
     // Draw each cell
     for y in 0..9 {
         for x in 0..9 {
+            // Calculate position accounting for dividers
+            let extra_x_dividers = (x / 3) as u16;
+            let extra_y_dividers = (y / 3) as u16;
+            
             let cell_area = Rect::new(
-                grid_area.x + (x as u16 * cell_width),
-                grid_area.y + (y as u16 * cell_height),
+                grid_area.x + (x as u16 * cell_width) + extra_x_dividers,
+                grid_area.y + (y as u16 * cell_height) + extra_y_dividers,
                 cell_width,
                 cell_height,
             );

@@ -110,3 +110,19 @@ The result Just Worked (except for an import issue).
 
 I didn't use LLMs for this at all; just standard Google etc.
 Both Claude and Copilot were totally useless for this.
+
+# Dividers between boxes
+
+At this point we consistently have this kind of display:
+
+```
+      ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│
+      │    ││    ││    ││ 2  ││ 6  ││    ││ 7  ││    ││ 1  │
+      └────┘└────┘└────│└────┘└────┘└────│└────┘└────┘└────│
+      ┌────┐┌────┐┌────│┌────┐┌────┐┌────│┌────┐┌────┐┌────│
+      │ 6  ││ 8  ││    ││    ││ 7  ││    ││    ││ 9  ││    │
+```
+
+Notice the unsightly overlap between the dividing lines and the boxes.
+
+Claude [was eventually able to fix this](https://claude.ai/chat/5664acec-e180-4057-ad4e-8ca3b560ac79), but it took a bunch of adjustments to my method of asking.
